@@ -56,3 +56,80 @@ The first version will handle stockout exceptions within a fixed 14-day planning
 A stockout exception occurs when forecast demand over the next 14 days exceeds the sum of current inventory and confirmed inbound inventory during that period.
 
 The MVP will allow a supply-chain planner to select an exception, initiate an AI-assisted investigation, review a structured resolution recommendation, and approve or reject the recommendation.
+
+## Resolution Options
+
+For the MVP, the agent can produce one of three final recommendation types:
+
+1. Transfer inventory from another distribution center.
+2. Expedite an existing inbound shipment from the supplier.
+3. Escalate the exception for manual review when neither option is feasible or the available evidence is insufficient.
+
+The agent will investigate the cause of the stockout, evaluate the feasibility, cost, risk, and policy compliance of the available options, and recommend the best-supported resolution.
+
+The agent will not execute operational actions. Every recommendation must be reviewed and approved or rejected by an authorized human user.
+
+## Agent Investigation Responsibilities
+
+For each selected stockout exception, the agent will:
+
+1. Retrieve the exception details.
+2. Determine the likely cause using demand, inventory, and inbound-shipment data.
+3. Evaluate whether inventory can be transferred from another distribution center.
+4. Evaluate whether the existing inbound shipment can be expedited.
+5. Check the applicable company policies.
+6. Escalate the exception when data is missing, conflicting, or insufficient.
+
+The agent must gather and evaluate sufficient evidence before producing a resolution recommendation.
+
+## Structured Recommendation Output
+
+After completing the investigation, the agent must return a structured recommendation containing:
+
+1. Exception ID
+2. Identified root cause
+3. Recommended action: `transfer`, `expedite`, or `manual_review`
+4. Action details, such as quantity, source location, or shipment
+5. Supporting operational evidence
+6. Relevant policy evidence
+7. Expected business impact
+8. Risks and assumptions
+9. Reason for escalation, if applicable
+
+The output must follow a validated schema so the application can reliably display, store, and evaluate the recommendation.
+
+After receiving a valid recommendation, the application will create an approval record with an initial status of `pending`. The agent cannot approve its own recommendation or execute an operational action.
+
+## Human Approval Workflow
+
+Every agent recommendation requires review by an authorized supply-chain planner.
+
+The application will:
+
+1. Display the recommendation and its supporting evidence.
+2. Allow the planner to approve or reject the recommendation.
+3. Allow the planner to add a decision comment.
+4. Store the decision, planner identity, timestamp, and recommendation version.
+5. Prevent the agent from changing or bypassing the approval decision.
+
+The approval status can transition from:
+
+- `pending` to `approved`
+- `pending` to `rejected`
+
+For the MVP, the workflow ends after the decision is recorded. The application will not execute an actual inventory transfer or supplier action because it does not connect to a real enterprise resource planning system.
+
+## MVP Limitations
+
+The MVP has the following boundaries:
+
+- Uses synthetic CPG data and fictional company policies.
+- Handles only stockout exceptions.
+- Uses a fixed 14-day planning window.
+- Supports only `transfer`, `expedite`, and `manual_review` recommendations.
+- Uses one supply-chain agent rather than a multi-agent system.
+- Does not connect to a real ERP, supplier, or warehouse system.
+- Does not execute approved operational actions.
+- Does not initially support real-time data ingestion.
+
+These limitations control the project’s business scope while allowing the implementation to demonstrate production-grade data, software, cloud, and AI-agent engineering.
